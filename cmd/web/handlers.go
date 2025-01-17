@@ -10,6 +10,10 @@ import (
 	"github.com/MikkelvtK/snippetbox/internal/validator"
 )
 
+const (
+	blankFieldErrorMessage = "This field cannot be blank"
+)
+
 type snippetCreateForm struct {
 	Title               string `form:"title"`
 	Content             string `form:"content"`
@@ -23,7 +27,7 @@ func (a *application) home(w http.ResponseWriter, r *http.Request) {
 		a.serverError(w, r, err)
 	}
 
-	data := newTemplateData(r)
+	data := a.newTemplateData(r)
 	data.Snippets = snips
 
 	a.render(w, r, http.StatusOK, "home.tmpl.html", data)
@@ -46,14 +50,14 @@ func (a *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := newTemplateData(r)
+	data := a.newTemplateData(r)
 	data.Snippet = snippet
 
 	a.render(w, r, http.StatusOK, "view.tmpl.html", data)
 }
 
 func (a *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
-	data := newTemplateData(r)
+	data := a.newTemplateData(r)
 
 	data.Form = snippetCreateForm{
 		Expires: 365,
@@ -77,7 +81,7 @@ func (a *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) 
 	form.CheckField(validator.PermittedValue(form.Expires, 1, 7, 365), "expires", "This field must equal 1, 7 or 365")
 
 	if !form.Valid() {
-		data := newTemplateData(r)
+		data := a.newTemplateData(r)
 		data.Form = form
 		a.render(w, r, http.StatusUnprocessableEntity, "create.tmpl.html", data)
 		return
