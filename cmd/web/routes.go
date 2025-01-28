@@ -19,6 +19,12 @@ func (a *application) routes() http.Handler {
 	mux.Handle("GET /snippet/create", dynamic.ThenFunc(a.snippetCreate))
 	mux.Handle("POST /snippet/create", dynamic.ThenFunc(a.snippetCreatePost))
 
+	mux.Handle("GET /user/signup", dynamic.ThenFunc(a.userSignup))
+	mux.Handle("POST /user/signup", dynamic.ThenFunc(a.userSignupPost))
+	mux.Handle("GET /user/login", dynamic.ThenFunc(a.userLogin))
+	mux.Handle("POST /user/login", dynamic.ThenFunc(a.userLoginPost))
+	mux.Handle("POST /user/logout", dynamic.ThenFunc(a.userLogoutPost))
+
 	standard := alice.New(a.recoverPanic, a.logRequest, commonHeaders)
 
 	return standard.Then(mux)
