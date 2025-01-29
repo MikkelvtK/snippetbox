@@ -7,14 +7,17 @@ import (
 	"time"
 
 	"github.com/MikkelvtK/snippetbox/internal/models"
+	"github.com/justinas/nosurf"
 )
 
 type templateData struct {
-	Snippet     models.Snippet
-	Snippets    []models.Snippet
-	CurrentYear int
-	Form        any
-	Flash       string
+	Snippet         models.Snippet
+	Snippets        []models.Snippet
+	CurrentYear     int
+	Form            any
+	Flash           string
+	IsAuthenticated bool
+	CSRFToken       string
 }
 
 var functions = template.FuncMap{
@@ -27,8 +30,10 @@ func humanDate(t time.Time) string {
 
 func (a *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
-		CurrentYear: time.Now().Year(),
-		Flash:       a.sessionManager.PopString(r.Context(), "flash"),
+		CurrentYear:     time.Now().Year(),
+		Flash:           a.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: a.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
 	}
 }
 
